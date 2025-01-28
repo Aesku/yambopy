@@ -227,6 +227,7 @@ class YambopyBandStructure():
         label   = kwargs.pop('label',None)
         lw_label  = kwargs.pop('lw_label',None)
         marker = kwargs.pop('marker',None)
+        fontsize = kwargs.pop('fontsize',None)
         linestyle = kwargs.pop('linestyle',None)
 
         # I choose a colormap for spin
@@ -253,7 +254,7 @@ class YambopyBandStructure():
         self.set_ax_lim(ax,fermie=fermie,xlim=xlim,ylim=ylim)
         ax.set_ylabel(ylabel)
         self.add_kpath_labels(ax)
-        if legend: ax.legend()
+        if legend: ax.legend(fontsize=fontsize)
 
     def plot_spin_ax(self,ax,xlim=None,ylim=None,ylabel='$\epsilon_{n\mathbf{k}}$[eV]',alpha_weights=0.5,spin_proj_bands=None,legend=False,**kwargs):
         """Receive an intance of matplotlib axes and add the plot"""

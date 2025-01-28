@@ -1260,7 +1260,8 @@ class YamboMagnonDB(object):
         """
         Calculate the dielectric response function using excitonic states
         """
-        if nexcitons == 'all': nexcitons = self.nexcitons
+        if nexcitons == 'all': 
+           nexcitons = self.nexcitons
 
         #energy range
         w = np.arange(emin,emax,estep,dtype=np.float32)
@@ -1271,7 +1272,7 @@ class YamboMagnonDB(object):
             print("energy steps: %lf"%nenergies)
 
         #initialize the susceptibility intensity
-        chi = np.zeros([len(w)],dtype=np.complex64)
+        chi = np.zeros([nenergies],dtype=np.complex64)
 
         if dipoles is None:
             #get dipole
@@ -1282,12 +1283,13 @@ class YamboMagnonDB(object):
             if verbose: print("calculate exciton-light coupling")
             EL1,EL2 = self.project1(dipoles.dipoles[:,dir],nexcitons) 
 
-        if isinstance(broad,float): broad = [broad]*nexcitons
+        if isinstance(broad,float):
+           broad = [broad]*nexcitons
 
         if isinstance(broad,tuple): 
-            broad_slope = broad[1]-broad[0]
-            min_exciton = np.min(self.eigenvalues.real)
-            broad = [ broad[0]+(es-min_exciton)*broad_slope for es in self.eigenvalues[:nexcitons].real]
+           broad_slope = broad[1]-broad[0]
+           min_exciton = np.min(self.eigenvalues.real)
+           broad = [ broad[0]+(es-min_exciton)*broad_slope for es in self.eigenvalues[:nexcitons].real]
 
         if "gaussian" in broad or "lorentzian" in broad:
             i = broad.find(":")
@@ -1311,22 +1313,21 @@ class YamboMagnonDB(object):
             #calculate the green's functions
             G1 = -1/(   w - es + broad[s]*I)
             G2 = -1/( - w - es - broad[s]*I)
-
-            r = EL1[s]*EL2[s]
+            r = EL1[0,s]*EL2[0,s] #Residuals for magnons and excitons are defined differently
             chi += r*G1 + r*G2
 
         #dimensional factors
         try:
-            if not self.Qpt=='1': q0norm = 2*np.pi*np.linalg.norm(self.car_qpoint)
+           if not self.Qpt=='1': q0norm = 2*np.pi*np.linalg.norm(self.car_qpoint)
+           
         except:
-            print("[WARNING] 1/q^2 set to 1 in eps2")
-            q0norm=1
+           print("[WARNING] 1/q^2 set to 1 in eps2")
+           q0norm=1
         try:
-            if self.q_cutoff is not None: q0norm = self.q_cutoff
+           if self.q_cutoff is not None: q0norm = self.q_cutoff
         except:
-            print("[WARNING] 1/q^2 set to 1 in eps2")
-            q0norm=1
-
+           print("[WARNING] 1/q^2 set to 1 in eps2")
+           q0norm=1
         d3k_factor = self.lattice.rlat_vol/self.lattice.nkpoints
         cofactor = ha2ev*spin_degen/(2*np.pi)**3 * d3k_factor * (4*np.pi)  / q0norm**2
 
@@ -1421,7 +1422,7 @@ class YamboMagnonDB(object):
         for var in cleanup_vars: kwargs.pop(var,None)
         if 're' in reim: ax.plot(w,chi.real,**kwargs)
         if 'im' in reim: ax.plot(w,chi.imag,**kwargs)
-        ax.set_ylabel('$Im(\chi(\omega))$')
+        ax.set_ylabel('Im$[\chi^{+-}(\omega)]$')
         ax.set_xlabel('Energy (eV)')
         #plot vertical bar on the brightest excitons
         if n_brightest>-1:
