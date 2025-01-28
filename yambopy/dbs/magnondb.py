@@ -275,21 +275,20 @@ class YamboMagnonDB(object):
                 excitons.append(n+1)
         return excitons
 
-    def exciton_bs(self,energies,path,excitons=(0,),debug=False):
+    def magnon_bs(self,energies,path,magnons=(0,),debug=False):
         """
-        Calculate exciton band-structure
+        Calculate magnon band-structure
             
             Arguments:
             energies -> can be an instance of YamboElectronsDB or YamboQPDB
             path     -> Path object in reduced coordinates to use for plotting the band structure
-            exciton  -> exciton index to plot
-            spin     -> So far only spin_pol='no' (or spin-up only) is implemented. Can be extended to spin_pol='pol' (spin-polarized)
+            magnons  -> magnon index to plot
         """
         if self.eigenvectors is None:
-            raise ValueError('This database does not contain Excitonic states,'
+            raise ValueError('This database does not contain Magnonic states,'
                               'please re-run the yambo BSE calculation with the WRbsWF option in the input file.')
-        if isinstance(excitons, int):
-            excitons = (excitons,)
+        if isinstance(magnons, int):
+            magnons = (magnons,)
 
         car_kpoints = self.lattice.car_kpoints
         rlat        = self.lattice.rlat
@@ -320,7 +319,7 @@ class YamboMagnonDB(object):
         else:
             raise ValueError("Energies argument must be an instance of YamboElectronsDB or YamboQPDB. Got %s"%(type(energies)))
 
-        exc_weights = self.get_exciton_weights(excitons)      
+        exc_weights = self.get_exciton_weights(magnons)      
         exc_energies = exc_energies[band_indexes]
         exc_weights  = exc_weights[band_indexes]
 
@@ -328,20 +327,6 @@ class YamboMagnonDB(object):
         exc_energies -= max(exc_energies[:,max(self.unique_vbands)])
         
         return bands_kpoints, exc_energies, exc_weights, path_car 
-
-    def magnon_bs(self,energies,path,magnons=(0,),debug=False):
-        """
-        Calculate magnon band-structure
-            
-            Arguments:
-            energies -> can be an instance of YamboElectronsDB or YamboQPDB
-            path     -> Path object in reduced coordinates to use for plotting the band structure
-            magnons  -> magnon index to plot
-
-            FP: to be moved in a separate class
-
-            TO BE IMPLEMENTED
-        """
 
     def arpes_intensity(self,energies_db,path,excitons,ax):   #,size=1,space='bands',f=None,debug=False): later on
         """
@@ -962,24 +947,20 @@ class YamboMagnonDB(object):
 
     def get_magnon_bs(self,energies_db,path,excitons,size=1,space='bands',f=None,debug=False):
         """
-        Get a YambopyBandstructure object with the exciton band-structure
+        Get a YambopyBandstructure object with the magnon band-structure
         
             Arguments:
             ax          -> axis extance of matplotlib to add the plot to
             lattice     -> Lattice database
             energies_db -> Energies database, can be either a SaveDB or QPDB
             path        -> Path in the brillouin zone
-
-            FP: to be moved in a separate class
-
-            TO BE IMPLEMENTED
         """
         from qepy.lattice import Path
-        if not isinstance(path,Path): 
+        if not isinstance(path,Path):
             raise ValueError('Path argument must be a instance of Path. Got %s instead'%type(path))
     
         if space == 'bands':
-            bands_kpoints, energies, weights = self.magnon_bs(energies_db, path.kpoints, excitons, debug)
+            bands_kpoints, energies, weights, path_car = self.magnon_bs(energies_db, path, excitons, debug)
             nkpoints = len(bands_kpoints)
             plot_energies = energies[:,self.start_band:self.mband]
             plot_weights  = weights[:,self.start_band:self.mband]
@@ -993,7 +974,8 @@ class YamboMagnonDB(object):
                 plot_energies[:,eh] = energies[:,c]-energies[:,v]
                 plot_weights[:,eh] = weights[:,c] 
 
-        if f: plot_weights = f(plot_weights)
+        if f:
+            plot_weights = f(plot_weights)
         size *= 1.0/np.max(plot_weights)
         ybs = YambopyBandStructure(plot_energies, bands_kpoints, weights=plot_weights, kpath=path, size=size)
         return ybs

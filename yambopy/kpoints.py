@@ -89,7 +89,6 @@ def get_path(car_kpoints,rlat,sym_car,path,debug=False):
     * bands_indexes: indexes of the kpoints in the path
     * path_car: path in Cartesian coordinates
     """
-
     # expand if symmetries are provided, otherwise the kpoints are considered already expanded
     if sym_car is None: nks = list(range(len(car_kpoints)))
     else:               _, nks, _, car_kpoints = expand_kpoints(car_kpoints,sym_car,rlat)
