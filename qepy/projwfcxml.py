@@ -171,7 +171,7 @@ class ProjwfcXML(object):
 
 
     def plot_eigen(self, ax, size=20, cmap=None, cmap2=None,color='r', color_2='b',path_kpoints=[], label_1='', label_2='',
-                   selected_orbitals=[], selected_orbitals_2=[],bandmin=0,bandmax=None,alpha=1,size_projection=False,y_offset=0.0,marker='o'):
+                   selected_orbitals=[], selected_orbitals_2=[],bandmin=0,bandmax=None,alpha=1,size_projection=False,y_offset=0.0,marker='o', LW = 1):
         """ 
         Plot the band structure. The size of the points is the weigth of the selected orbitals.
 
@@ -202,7 +202,7 @@ class ProjwfcXML(object):
             if isinstance(path_kpoints,Path):
                 path_kpoints = path_kpoints.get_indexes()
         if bandmax is None or bandmax > self.nbands:
-            bandmax = self.nbands
+            bandmax = self.nbands-1
 
         #Colormap
         if cmap:  color_map = plt.get_cmap(cmap)
@@ -220,7 +220,7 @@ class ProjwfcXML(object):
         ax.set_ylabel('E (eV)')
 
         #plot vertical lines
-        for t in ticks: ax.axvline(kpoints_dists[t],c='k',lw=1)
+        for t in ticks: ax.axvline(kpoints_dists[t],c='k',lw=LW)
         ax.axhline(0,c='k')
      
         # Plot bands for fixed size in a colormap
@@ -229,7 +229,6 @@ class ProjwfcXML(object):
            if self.spin_components == 1 or self.spin_components == 4:
               w_rel = self.get_relative_weight(selected_orbitals=selected_orbitals, selected_orbitals_2=selected_orbitals_2)
               for ib in range(bandmin,bandmax):
-                  print(ib)
                   eig = self.eigen[:,ib] + y_offset
                   eig_last = self.eigen[:,-1] + y_offset
                   state = self.states
@@ -267,7 +266,6 @@ class ProjwfcXML(object):
                    cax = ax.scatter(kpoints_dists,eig,s=w_proj[:,ib]*size,c=color,edgecolors='none',alpha=alpha,label=lab,rasterized=True,zorder=2,marker=marker)
 
             elif self.spin_components == 2:
-                 w_proj1, w_proj2 = self.get_weights(selected_orbitals=selected_orbitals)
                  ib_max1, ib_max2 = np.where(w_proj1==np.max(w_proj1))[1][0], np.where(w_proj2==np.max(w_proj2))[1][0]
                  for ib in range(bandmin,bandmax):
                      lab1, lab2 = ['_'+label_1,'_'+label_2]
