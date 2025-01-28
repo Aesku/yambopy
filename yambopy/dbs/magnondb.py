@@ -100,8 +100,6 @@ class YamboMagnonDB(object):
                 rer,imr = database.variables['BS_R_magn_Residuals'][:].T
                 l_residual = rel+iml*I
                 r_residual = rer+imr*I
-                print(l_residual)
-                print(r_residual)
             if 'BS_Residuals' in list(database.variables.keys()):
                 #residuals
                 rel,iml,rer,imr = database.variables['BS_Residuals'][:].T

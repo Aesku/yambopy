@@ -229,6 +229,7 @@ class ProjwfcXML(object):
            if self.spin_components == 1 or self.spin_components == 4:
               w_rel = self.get_relative_weight(selected_orbitals=selected_orbitals, selected_orbitals_2=selected_orbitals_2)
               for ib in range(bandmin,bandmax):
+                  print(ib)
                   eig = self.eigen[:,ib] + y_offset
                   eig_last = self.eigen[:,-1] + y_offset
                   state = self.states
