@@ -240,9 +240,9 @@ class YambopyBandStructure():
             ax.plot(x,y,c=c_bands,lw=lw_label,marker=marker,linestyle=linestyle,label=label if ib == 0 else "_nolegend_")
             # fill between 
             if self.weights is not None: # and self.spin_proj is not None:
-                dy = self.weights[:,ib]*size
-                color_spin = self.spin_proj[:,ib] + 0.5 # I renormalize 0 => down; 1 => up
-            #    ax.fill_between(x,y+dy,y-dy,alpha=alpha_weights,color=c_weights,linewidth=0,label=label)
+                dy = self.weights[:,ib-1]*size
+            #    color_spin = self.spin_proj[:,ib] + 0.5 # I renormalize 0 => down; 1 => up
+                ax.fill_between(x,y+dy,y-dy,alpha=alpha_weights,color=c_weights,linewidth=0,label=label)
                 ax.scatter(x,y,s=100,c=color_spin,cmap=color_map,vmin=0.0,vmax=1.0,edgecolors='none')
             # dot
             #if self.weights is not None:
@@ -256,8 +256,49 @@ class YambopyBandStructure():
         self.add_kpath_labels(ax)
         if legend: ax.legend(fontsize=fontsize)
 
+    def plot_spin_pol_ax(self,ax,xlim=None,ylim=None,size=1.,ylabel='$\epsilon_{n\mathbf{k}}$ [eV]', alpha_weights=0.5,legend=False,**kwargs):
+        """Receive an instance of matplotlib axes and add the plot"""
+        import matplotlib.pyplot as plt
+        kwargs = self.get_kwargs(**kwargs)
+        fermie = kwargs.pop('fermie',self.fermie)
+
+        # Set kwargs
+        c_bands   = kwargs.pop('c_bands',None)
+        c_weights = kwargs.pop('c_weights',None)
+        label   = kwargs.pop('label',None)
+        lw_label  = kwargs.pop('lw_label',None)
+        marker = kwargs.pop('marker',None)
+        fontsize = kwargs.pop('fontsize',None)
+        linestyle = kwargs.pop('linestyle',None)
+
+        #Diff. colors for spin-up and spin-dn
+        x = self.distances
+        y = self.bands.T-fermie
+        for ib,band in enumerate(self.bands.T):
+            x = self.distances
+            y = band-fermie
+            ax.plot(x,y,c=c_bands,lw=lw_label,marker=marker,linestyle=linestyle,label=label if ib == 0 else "_nolegend_")
+            # fill between 
+            if self.weights is not None: # and self.spin_proj is not None:
+                dy = self.weights[:,ib-1]*size
+            #    color_spin = self.spin_proj[:,ib] + 0.5 # I renormalize 0 => down; 1 => up
+                ax.fill_between(x,y+dy,y-dy,alpha=alpha_weights,color=c_weights,linewidth=0,label=label)
+#                ax.scatter(x,y,s=100,c=color_spin,cmap=color_map,vmin=0.0,vmax=1.0,edgecolors='none')
+                ax.plot(x,y,c=c_bands)
+            # dot
+            #if self.weights is not None:
+            #    plt.plot(x,y)#,c=c_weights,size=dy,alpha=alpha_weights)
+            #    ax.scatter(x,y,c=c_weights,size=dy,alpha=alpha_weights)
+
+            #kwargs.pop('label',None)
+
+        self.set_ax_lim(ax,fermie=fermie,xlim=xlim,ylim=ylim)
+        ax.set_ylabel(ylabel)
+        self.add_kpath_labels(ax)
+        if legend: ax.legend(fontsize=fontsize)
+
     def plot_spin_ax(self,ax,xlim=None,ylim=None,ylabel='$\epsilon_{n\mathbf{k}}$[eV]',alpha_weights=0.5,spin_proj_bands=None,legend=False,**kwargs):
-        """Receive an intance of matplotlib axes and add the plot"""
+        """Receive an instance of matplotlib axes and add the plot"""
         #
         # There is a problem with the number of points in the k-poitns path
         #

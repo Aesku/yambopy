@@ -1307,7 +1307,7 @@ class YamboMagnonDB(object):
         excitons: list of BS eigenvalues order, e.g., [1], [1,2,3], [2,15,23,31], etc.
 
         """
-        table_up, table_dw, table_updw = [] , [], []
+        table_updw = []
         for t,kcv in enumerate(self.table): #Magn table: kvc cond_spin val_spin
             k,v,c,c_s,v_s = kcv-1   # We substract 1 to be consistent with python numbering of arrays
             table_updw.append(kcv[0:3]) #Spin-flip transitions
@@ -1318,8 +1318,8 @@ class YamboMagnonDB(object):
             cbands.append(table_updw[k][2]-1)
         self.unique_vbands_updw = np.unique(vbands) #Indices of spin-up vbands
         self.unique_cbands_updw = np.unique(cbands) #Indices of spin-dw cbands
-        self.mband_updw = max(self.unique_cbands_updw) + 1
-        self.start_band_updw = min(self.unique_vbands_updw)
+        self.mband_updw = max(self.unique_cbands_updw) + 1 #Last band in the BSE transitions (=last cond.)
+        self.start_band_updw = min(self.unique_vbands_updw) + 1  #First band in the BSE transitions (=last val.) 
         weights_updw = np.zeros([self.nkpoints,self.mband_updw])
         table_updw=np.array(table_updw)
         for exciton in excitons:
@@ -1327,15 +1327,19 @@ class YamboMagnonDB(object):
             eivec = self.eigenvectors[exciton-1]
             #add weights
             sum_weights = 0
-            for t,kcv in enumerate(self.table):
-                k,c,v,c_s,v_s = kcv-1   # We substract 1 to be consistent with python numbering of arrays
+            for t,kcv in enumerate(self.table): #t: transition
+                k,v,c,c_s,v_s = kcv-1   # We substract 1 to be consistent with python numbering of arrays
                 this_weight = abs2(eivec[t])
+                weights_updw[k,c] += this_weight
+                weights_updw[k,v] += this_weight
+                """
                 if c_s == 0 and v_s == 0:
                    weights_up[k,c] += this_weight
                    weights_up[k,v] += this_weight
                 elif c_s == 1 and v_s == 1: 
                    weights_dw[k,c] += this_weight
                    weights_dw[k,v] += this_weight
+                """
                 sum_weights += this_weight
             if abs(sum_weights - 1) > 1e-3: raise ValueError('Excitonic weights does not sum to 1 but to %lf.'%sum_weights)
  
