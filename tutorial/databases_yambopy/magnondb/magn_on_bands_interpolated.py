@@ -34,7 +34,7 @@ if __name__ == "__main__":
     magn_on_bands = ymagn.interpolate(yel,path,states,lpratio=10,f=None,verbose=True)
 
     # The 'size' argument controls the weight widths
-    magn_on_bands.plot_ax(ax,c_bands='k',c_weights='red',size=1.,alpha_weights=0.5)
+    magn_on_bands.plot_ax(ax,c_bands='k',c_weights='red',size=100,alpha_weights=0.5)
 
     ax.set_ylim(-7.5,12.)
     plt.show()

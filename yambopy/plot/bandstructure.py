@@ -216,7 +216,7 @@ class YambopyBandStructure():
         self.kpath.set_xticks(ax)
 
     def plot_ax(self,ax,xlim=None,ylim=None,size=1.,ylabel='$\epsilon_{n\mathbf{k}}$ [eV]', alpha_weights=0.5,legend=False,**kwargs):
-        """Receive an intance of matplotlib axes and add the plot"""
+        """Receive an instance of matplotlib axes and add the plot"""
         import matplotlib.pyplot as plt
         kwargs = self.get_kwargs(**kwargs)
         fermie = kwargs.pop('fermie',self.fermie)
@@ -241,9 +241,9 @@ class YambopyBandStructure():
             # fill between 
             if self.weights is not None: # and self.spin_proj is not None:
                 dy = self.weights[:,ib]*size
-                #color_spin = self.spin_proj[:,ib] + 0.5 # I renormalize 0 => down; 1 => up
-                ax.fill_between(x,y+dy,y-dy,alpha=alpha_weights,color=c_weights,linewidth=0,label=label)
-                #ax.scatter(x,y,s=100,c=color_spin,cmap=color_map,vmin=0.0,vmax=1.0,edgecolors='none')
+                color_spin = self.spin_proj[:,ib] + 0.5 # I renormalize 0 => down; 1 => up
+            #    ax.fill_between(x,y+dy,y-dy,alpha=alpha_weights,color=c_weights,linewidth=0,label=label)
+                ax.scatter(x,y,s=100,c=color_spin,cmap=color_map,vmin=0.0,vmax=1.0,edgecolors='none')
             # dot
             #if self.weights is not None:
             #    plt.plot(x,y)#,c=c_weights,size=dy,alpha=alpha_weights)
@@ -288,13 +288,14 @@ class YambopyBandStructure():
             ax.plot(x,y,color=c_bands,**kwargs,zorder=1)
 
             # fill between
-#            if self.weights is not None:
-#               dy = self.weights[:,ib]*size
-#               color_spin = color_map(spin_proj_bands[:,n_valence + ib] + 0.5) # I renormalize 0 => down; 1 => up
-#               ax.fill_between(x,y+dy,y-dy,alpha=alpha_weights,color=color_spin,linewidth=0,label=c_label)
+            if self.weights is not None:
+               dy = self.weights[:,ib]*size
+               color_spin = color_map(spin_proj_bands[:,n_valence + ib] + 0.5) # I renormalize 0 => down; 1 => up
+               ax.fill_between(x,y+dy,y-dy,alpha=alpha_weights,color=color_spin,linewidth=0,label=c_label)
 
             # dot
             if self.weights is not None:
+               dy = self.weights[:,ib]*size
                dy = self.weights[:,ib]*size*1000
                color_spin = spin_proj_bands[:,n_valence + ib] + 0.5 # I renormalize 0 => down; 1 => up
                ax.scatter(x,y,s=abs(dy),c=color_spin,cmap=color_map,edgecolors='none',zorder=2,rasterized=True) 
