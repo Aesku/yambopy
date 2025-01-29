@@ -1332,14 +1332,6 @@ class YamboMagnonDB(object):
                 this_weight = abs2(eivec[t])
                 weights_updw[k,c] += this_weight
                 weights_updw[k,v] += this_weight
-                """
-                if c_s == 0 and v_s == 0:
-                   weights_up[k,c] += this_weight
-                   weights_up[k,v] += this_weight
-                elif c_s == 1 and v_s == 1: 
-                   weights_dw[k,c] += this_weight
-                   weights_dw[k,v] += this_weight
-                """
                 sum_weights += this_weight
             if abs(sum_weights - 1) > 1e-3: raise ValueError('Excitonic weights does not sum to 1 but to %lf.'%sum_weights)
  
@@ -1363,7 +1355,7 @@ class YamboMagnonDB(object):
         symrel = [sym for sym,trev in zip(lattice.sym_rec_red,lattice.time_rev_list) if trev==False ]
         time_rev = True
  
-        weights_updw = self.get_exciton_weights_spin_pol(excitons) #BUGGY
+        weights_updw = self.get_exciton_weights_spin_pol(excitons)
 
         weights_up = weights_updw[:,self.start_band_updw:self.mband_updw]
         weights_dw = weights_updw[:,self.start_band_updw:self.mband_updw]
@@ -1382,13 +1374,7 @@ class YamboMagnonDB(object):
         ibz_weights_dw = np.zeros([ibz_nkpoints,self.mband_updw-self.start_band_updw]) 
         
         ibz_kpoints = np.zeros([ibz_nkpoints,3])
-#        print(self.mband_up,self.start_band_updw)
-#        print(ibz_weights_up.shape)
-#        print(weights_up.shape)
-#        print(lattice.kpoints_indexes)
-#        print('just before error')
         for idx_bz,idx_ibz in enumerate(lattice.kpoints_indexes):
-#            print(weights_up[idx_bz,:])
             ibz_weights_up[idx_ibz,:], ibz_weights_dw[idx_ibz,:]= weights_up[idx_bz,:], weights_dw[idx_bz,:] 
             ibz_kpoints[idx_ibz] = lattice.red_kpoints[idx_bz]
 
