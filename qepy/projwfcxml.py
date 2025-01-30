@@ -266,6 +266,7 @@ class ProjwfcXML(object):
                    cax = ax.scatter(kpoints_dists,eig,s=w_proj[:,ib]*size,c=color,edgecolors='none',alpha=alpha,label=lab,rasterized=True,zorder=2,marker=marker)
 
             elif self.spin_components == 2:
+                 w_proj1,w_proj2 = self.get_weights(selected_orbitals=selected_orbitals)
                  ib_max1, ib_max2 = np.where(w_proj1==np.max(w_proj1))[1][0], np.where(w_proj2==np.max(w_proj2))[1][0]
                  for ib in range(bandmin,bandmax):
                      lab1, lab2 = ['_'+label_1,'_'+label_2]

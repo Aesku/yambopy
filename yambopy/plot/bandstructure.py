@@ -241,9 +241,10 @@ class YambopyBandStructure():
             # fill between 
             if self.weights is not None: # and self.spin_proj is not None:
                 dy = self.weights[:,ib-1]*size
-            #    color_spin = self.spin_proj[:,ib] + 0.5 # I renormalize 0 => down; 1 => up
+#                color_spin = self.spin_proj[:,ib] + 0.5 # I renormalize 0 => down; 1 => up
                 ax.fill_between(x,y+dy,y-dy,alpha=alpha_weights,color=c_weights,linewidth=0,label=label)
-                ax.scatter(x,y,s=100,c=color_spin,cmap=color_map,vmin=0.0,vmax=1.0,edgecolors='none')
+                ax.plot(x,y,c='k')
+#                ax.scatter(x,y,s=100,c=color_spin,cmap=color_map,vmin=0.0,vmax=1.0,edgecolors='none')
             # dot
             #if self.weights is not None:
             #    plt.plot(x,y)#,c=c_weights,size=dy,alpha=alpha_weights)
@@ -284,7 +285,7 @@ class YambopyBandStructure():
             #    color_spin = self.spin_proj[:,ib] + 0.5 # I renormalize 0 => down; 1 => up
                 ax.fill_between(x,y+dy,y-dy,alpha=alpha_weights,color=c_weights,linewidth=0,label=label)
 #                ax.scatter(x,y,s=100,c=color_spin,cmap=color_map,vmin=0.0,vmax=1.0,edgecolors='none')
-                ax.plot(x,y,c=c_bands)
+                ax.plot(x,y,c=c_bands, ls = linestyle)
             # dot
             #if self.weights is not None:
             #    plt.plot(x,y)#,c=c_weights,size=dy,alpha=alpha_weights)
