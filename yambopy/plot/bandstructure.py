@@ -74,6 +74,7 @@ class YambopyBandStructure():
     """
     Class to plot bandstructures
     I include spin projection (to be improve and checked)  AMS
+    I include dispersion relation interpolated with SKW AEK
     """
     _colormap = 'rainbow'
 
@@ -201,7 +202,7 @@ class YambopyBandStructure():
         fullkwargs.update(kwargs)
         return fullkwargs
 
-    def add_kpath_labels(self,ax):
+    def add_kpath_labels(self,ax, kline_width = 2, kline_style = '--'):
         """
         Add vertical lines at the positions of the high-symmetry k-points
         I did a modification that I don't like much. To be corrected
@@ -210,9 +211,9 @@ class YambopyBandStructure():
             ax.xaxis.set_ticks([])
             return 
         for kpoint, klabel, distance in self.kpath:
-            ax.axvline(distance,c='k',ls='--',lw=0.5)
-        ax.axvline(0.0,c='k',ls='-',lw=0.0)
-        ax.axvline(distance,c='k',ls='-',lw=0.0)
+            ax.axvline(distance,c='k',ls=kline_style,lw=kline_width)
+        ax.axvline(0.0,c='k',ls='-',lw=kline_width)
+        ax.axvline(distance,c='k',ls='-',lw=kline_width)
         self.kpath.set_xticks(ax)
 
     def plot_ax(self,ax,xlim=None,ylim=None,size=1.,ylabel='$\epsilon_{n\mathbf{k}}$ [eV]', alpha_weights=0.5,legend=False,**kwargs):
@@ -229,6 +230,8 @@ class YambopyBandStructure():
         marker = kwargs.pop('marker',None)
         fontsize = kwargs.pop('fontsize',None)
         linestyle = kwargs.pop('linestyle',None)
+        kline_width = kwargs.pop('kline_width',2)
+        kline_style = kwargs.pop('kline_style','-')
 
         # I choose a colormap for spin
         color_map  = plt.get_cmap('seismic')
@@ -254,7 +257,7 @@ class YambopyBandStructure():
 
         self.set_ax_lim(ax,fermie=fermie,xlim=xlim,ylim=ylim)
         ax.set_ylabel(ylabel)
-        self.add_kpath_labels(ax)
+        self.add_kpath_labels(ax, kline_width = kline_width, kline_style = kline_style)
         if legend: ax.legend(fontsize=fontsize)
 
     def plot_spin_pol_ax(self,ax,xlim=None,ylim=None,size=1.,ylabel='$\epsilon_{n\mathbf{k}}$ [eV]', alpha_weights=0.5,legend=False,**kwargs):
@@ -350,7 +353,59 @@ class YambopyBandStructure():
         self.add_kpath_labels(ax)
         if legend: ax.legend()
 
+    def interpolate_dispersion(self,energies,path,states,lat,lpratio=5,f=None,verbose=1,size=1,**kwargs):
+        """ 
+        Interpolate exciton dispersion relation using SKW interpolation from Abipy
+        energies: list of Q-ordered eigenvalues from ndb.diago_Q* 
+        states: eigenvalues to be plotted [1], [1,2], [1,14,32], etc.
 
+        """
+        from yambopy.tools.skw import SkwInterpolator
+#        kpoints = car_red(np.array([ k/lat.alat for k in lat.ibz_kpoints ]),lat.rlat) #IBZ reduced kpoints 
+        k_points = self.kpoints
+#        eivs = [np.real(e[s]) for e in energies] #All energies 
+        # sym_red are the symmetries of the reciprocal lattice...
+        # skw interp wants the symmetries of the direct lattice, so we use sym_rec_red
+        # plus, we take the non t-revved ones
+        symrel = [sym for sym,trev in zip(lat.sym_rec_red,lat.time_rev_list) if trev==False ]
+        time_rev = bool(lat.time_rev)
+        print('h1')
+
+#        elif no_symmetries:
+#            eigs = energies.eigenvalues[0,:,self.start_band:self.mband]
+#            kpoints = lat.red_kpoints
+#            symrel = [np.identity(3)]
+#            time_rev = False
+#        else:
+#            raise ValueError("Energies argument must be an instance of YamboElectronsDB or YamboQPDB. Got %s"%(type(energies)))
+#
+#        # Additional input parameters for the SKW interpolator
+        na = np.newaxis
+        cell = (lat.lat, lat.red_atomic_positions, lat.atomic_numbers)
+        nelect = 0
+        fermie = kwargs.pop('fermie',0)
+        eivs = energies
+#        eigs = energies[:,states[0]:states[-1]]
+        # Get dense kpoints along the path (controlled by path.intervals)
+#        kpoints_path =  path.get_klist()[:,:3]
+        
+        #interpolate energies
+        print('h2')
+        skw = SkwInterpolator(lpratio,k_points,eivs[na,:,:],fermie,nelect,cell,symrel,time_rev,verbose=verbose)
+        print('h3')
+        exc_energies = skw.interp_kpts(kpoints_path).eigens
+        print('h4')
+        # For the band plot (bandstructure object), we need to switch to cartesian coordinates
+#        path_car = get_path_car(red_car(path.kpoints,lat.rlat),path)
+#        kpoints_path = path_car.get_klist()[:,:3]
+
+        #create band-structure object
+#        exc_bands = YambopyBandStructure(exc_energies[0],kpoints_path,kpath=path_car,weights=exc_weights[0],size=size,**kwargs)
+        #shift top v_band to zero
+#        exc_bands.set_fermi(self.nvbands)
+
+        return 1
+#        return exc_bands
 
     def __add__(self,y):
         """Add the bands of two systems together"""

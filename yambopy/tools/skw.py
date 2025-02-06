@@ -57,8 +57,11 @@ class SkwInterpolator():
         self.has_timrev = has_timrev
 
         # iscomplexobj is used to handle lifetimes.
+        print('s1',eigens)
         eigens = np.atleast_3d(eigens)
+        print('s2',eigens)
         self.iscomplexobj = np.iscomplexobj(eigens)
+        print('s3',eigens.shape)
         self.nsppol, self.nkpt, self.nband = eigens.shape
 
         if len(kpts) != self.nkpt:

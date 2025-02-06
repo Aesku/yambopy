@@ -241,7 +241,6 @@ class YamboQPDB():
             Here the path is a Path object given in rlu, since it's simpler
             for the user.
         """
-        
         bands_kpoints, bands_indexes, path_car = get_path(lat.car_kpoints,lat.rlat,lat.sym_car,path,debug=debug)
 
         # set fermi energy

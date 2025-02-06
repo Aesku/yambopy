@@ -81,13 +81,17 @@ class ExcitonDispersion():
         Check nexcitons and ntransitions in each database
         """
         nexcitons_each_Q    = np.zeros(nqpoints,dtype=int)
+        print('d1')
         for iQ in range(nqpoints):
             exc_obj = YamboExcitonDB.from_db_file(lattice,filename=folder+'/ndb.BS_diago_Q%d'%(iQ+1))
             nexcitons_each_Q[iQ] = exc_obj.nexcitons
             if iQ==0: tbl = exc_obj.table
 
+        print('d2')
         is_spin_pol = len(np.unique(tbl[:,3]))>1 or len(np.unique(tbl[:,4]))>1
+        print('d3')
         is_consistent = np.all(nexcitons_each_Q==nexcitons_each_Q[0])
+        print('d4')
         if not is_consistent: 
             print("[WARNING] BSE Hamiltonian has different dimensions for some Q.")
             print("          Taking the minimum number of transitions, be careful.")
