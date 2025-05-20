@@ -330,7 +330,8 @@ class PwXML():
             ax.set_xticks( path_ticks )
             ax.set_xticklabels( path_labels )
         ax.set_ylabel('E (eV)')
-
+        
+        spin = kwargs.pop('spin','both')
         ls = kwargs.pop('ls','solid')
         lw = kwargs.pop('lw',1)
         y_offset = kwargs.pop('y_offset',0.0)
@@ -352,8 +353,11 @@ class PwXML():
            eigen1 = np.array(self.eigen1)
 
            for ib in range(self.nbands_up):
-               ax.plot(kpoints_dists,eigen1[:,ib]                + y_offset, '%s-'%color, lw=lw, zorder=1,label='spin-up') # spin-up 
-               ax.plot(kpoints_dists,eigen1[:,ib+self.nbands_up] + y_offset, 'b-', lw=lw, zorder=1,label='spin-down') # spin-down
+               if spin == 'up': ax.plot(kpoints_dists,eigen1[:,ib]                + y_offset, '%s-'%color, lw=lw, zorder=1,label='spin-up') # spin-up 
+               if spin == 'dn': ax.plot(kpoints_dists,eigen1[:,ib+self.nbands_up] + y_offset, '%s-'%color, lw=lw, zorder=1,label='spin-down') # spin-down
+               if spin == 'both':
+                  ax.plot(kpoints_dists,eigen1[:,ib]                + y_offset, '%s-'%color, lw=lw, zorder=1,label='spin-up') # spin-up 
+                  ax.plot(kpoints_dists,eigen1[:,ib+self.nbands_up] + y_offset, 'b-', lw=lw, zorder=1,label='spin-down') # spin-down
 
            import matplotlib.pyplot as plt
            handles, labels = plt.gca().get_legend_handles_labels()
