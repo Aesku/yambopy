@@ -316,7 +316,7 @@ class PwXML():
         app("nbands:   %d"%self.nbands)
         return "\n".join(lines)
 
-    def plot_eigen_ax(self,ax,path_kpoints=[],xlim=(),ylim=(),color='r',**kwargs):
+    def plot_eigen_ax(self,ax,path_kpoints=[],xlim=(),ylim=(),color='r',x_axis = None,**kwargs):
         #
         # Careful with variable path. I am substituting vy path_kpoints
         # To be done in all the code (and in the tutorials)
@@ -332,11 +332,15 @@ class PwXML():
         ax.set_ylabel('E (eV)')
         
         spin = kwargs.pop('spin','both')
+        LEGEND = kwargs.pop('LEGEND',False)
+        return_x_axis = kwargs.pop('return_x_axis',False)
+        use_custom_x = kwargs.pop('use_custom_x',False)
         ls = kwargs.pop('ls','solid')
         lw = kwargs.pop('lw',1)
         y_offset = kwargs.pop('y_offset',0.0)
         #get kpoint_dists 
-        kpoints_dists = calculate_distances(self.kpoints)
+        if use_custom_x: kpoints_dists = x_axis
+        else: kpoints_dists = calculate_distances(self.kpoints)
         ticks, labels = list(zip(*path_kpoints))
         ax.set_xticks([kpoints_dists[t] for t in ticks])
         ax.set_xticklabels(labels)
@@ -353,16 +357,16 @@ class PwXML():
            eigen1 = np.array(self.eigen1)
 
            for ib in range(self.nbands_up):
-               if spin == 'up': ax.plot(kpoints_dists,eigen1[:,ib]                + y_offset, '%s-'%color, lw=lw, zorder=1,label='spin-up') # spin-up 
-               if spin == 'dn': ax.plot(kpoints_dists,eigen1[:,ib+self.nbands_up] + y_offset, '%s-'%color, lw=lw, zorder=1,label='spin-down') # spin-down
+               if spin == 'up': ax.plot(kpoints_dists,eigen1[:,ib]                + y_offset, color = color, ls = 'solid',lw=lw, zorder=1,label='spin-up') # spin-up 
+               if spin == 'dn': ax.plot(kpoints_dists,eigen1[:,ib+self.nbands_up] + y_offset, color = color, ls = 'solid',lw=lw, zorder=1,label='spin-down') # spin-down
                if spin == 'both':
                   ax.plot(kpoints_dists,eigen1[:,ib]                + y_offset, '%s-'%color, lw=lw, zorder=1,label='spin-up') # spin-up 
                   ax.plot(kpoints_dists,eigen1[:,ib+self.nbands_up] + y_offset, 'b-', lw=lw, zorder=1,label='spin-down') # spin-down
-
-           import matplotlib.pyplot as plt
-           handles, labels = plt.gca().get_legend_handles_labels()
-           by_label = dict(zip(labels, handles))
-           plt.legend(by_label.values(), by_label.keys())
+           if LEGEND:
+              import matplotlib.pyplot as plt
+              handles, labels = plt.gca().get_legend_handles_labels()
+              by_label = dict(zip(labels, handles))
+              plt.legend(by_label.values(), by_label.keys())
 
         # Case: Non spin polarization
         else:
@@ -374,6 +378,8 @@ class PwXML():
         #plot options
         if xlim: ax.set_xlim(xlim)
         if ylim: ax.set_ylim(ylim)
+
+        if return_x_axis: return kpoints_dists
 
      
     #def plot_eigen_spin_ax(self,ax,path_kpoints=[],xlim=(),ylim=(),spin_proj=None):
